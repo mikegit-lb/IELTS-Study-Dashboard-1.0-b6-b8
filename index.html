@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LBEnglishCo — IELTS Academic Study Dashboard (Band 5 → 7)</title>
+<style>
+  :root{
+    --navy:#1d3557; --navy2:#2a4a73; --blue:#457b9d; --light:#a8dadc;
+    --bg:#f7f9fb; --card:#ffffff; --ink:#23303a; --muted:#5c6b78;
+    --line:#e2e8ee; --amber:#fff4e0; --amberline:#e8a13a; --amberink:#8a5a12;
+    --green:#e8f5ec; --greenline:#2f9e57; --red:#fdecec; --redline:#c0392b;
+    --radius:12px; --shadow:0 2px 10px rgba(29,53,87,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.6;font-size:16px}
+  header.top{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:26px 20px 22px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+  .brand{font-size:13px;letter-spacing:3px;text-transform:uppercase;opacity:.85;font-weight:600}
+  header.top h1{margin:6px 0 4px;font-size:26px;font-weight:700}
+  header.top p{margin:0;opacity:.92;font-size:15px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:5px 12px;
+    border-radius:30px;font-size:13px;font-weight:600}
+  nav.tabs{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);
+    box-shadow:var(--shadow)}
+  .tabrow{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:2px;padding:6px 12px}
+  .tabrow button{border:0;background:transparent;color:var(--muted);font-weight:600;font-size:13.5px;
+    padding:9px 13px;border-radius:8px;cursor:pointer;white-space:nowrap}
+  .tabrow button:hover{background:#eef3f8;color:var(--navy)}
+  .tabrow button.active{background:var(--navy);color:#fff}
+  main{max-width:1080px;margin:0 auto;padding:24px 18px 80px}
+  section.panel{display:none;animation:fade .25s ease}
+  section.panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h2.sec{font-size:23px;color:var(--navy);margin:4px 0 4px;border-bottom:3px solid var(--light);padding-bottom:8px}
+  h3{color:var(--navy2);font-size:18px;margin:26px 0 8px}
+  h4{color:var(--navy2);font-size:15.5px;margin:18px 0 6px;text-transform:uppercase;letter-spacing:.5px}
+  .lead{color:var(--muted);margin-top:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;margin:14px 0;box-shadow:var(--shadow)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#eef3f8;color:var(--navy);font-weight:700}
+  tr:nth-child(even) td{background:#fafcfe}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px}
+  li{margin:4px 0}
+  .callout{border-radius:10px;padding:12px 15px;margin:14px 0;font-size:14.5px}
+  .turk{background:var(--amber);border:1px solid var(--amberline);color:var(--amberink)}
+  .turk b{color:#6e470d}
+  .win{background:var(--green);border:1px solid var(--greenline)}
+  .warn{background:var(--red);border:1px solid var(--redline)}
+  .coach{background:#eef3f8;border-left:4px solid var(--blue);padding:12px 15px;border-radius:6px;
+    margin:12px 0;font-style:italic;color:var(--navy2)}
+  .coach b{font-style:normal}
+  .tag{display:inline-block;background:var(--navy);color:#fff;font-size:11px;font-weight:700;
+    padding:2px 9px;border-radius:20px;letter-spacing:.5px;vertical-align:middle}
+  .tag.alt{background:var(--blue)}
+  .reveal-btn,.timer-btn{background:var(--blue);color:#fff;border:0;padding:8px 16px;border-radius:8px;
+    font-weight:600;cursor:pointer;font-size:14px;margin:6px 6px 6px 0}
+  .reveal-btn:hover,.timer-btn:hover{background:var(--navy)}
+  .answer{display:none;background:var(--green);border:1px solid var(--greenline);border-radius:8px;
+    padding:12px 15px;margin-top:8px}
+  .answer.show{display:block}
+  .timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:20px;color:var(--navy);
+    background:#eef3f8;padding:4px 12px;border-radius:8px;display:inline-block;min-width:74px;text-align:center}
+  .q{margin:10px 0;padding-left:6px}
+  .small{font-size:13px;color:var(--muted)}
+  .check label{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line);
+    cursor:pointer;font-size:14.5px}
+  .check input{margin-top:5px;width:17px;height:17px;flex:none;accent-color:var(--blue)}
+  .check label.done span{text-decoration:line-through;color:var(--muted)}
+  .progwrap{background:#e7eef5;border-radius:30px;height:14px;overflow:hidden;margin:10px 0}
+  .progbar{height:100%;background:linear-gradient(90deg,var(--greenline),var(--blue));width:0;transition:width .3s}
+  .kpi{text-align:center;padding:16px 10px}
+  .kpi .n{font-size:30px;font-weight:800;color:var(--navy)}
+  .kpi .l{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+  details{border:1px solid var(--line);border-radius:10px;padding:4px 14px;margin:10px 0;background:#fff}
+  summary{cursor:pointer;font-weight:700;color:var(--navy2);padding:8px 0}
+  code{background:#eef3f8;padding:1px 6px;border-radius:5px;font-size:13.5px}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:24px;border-top:1px solid var(--line)}
+  .sub-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 6px}
+  .sub-tabs button{border:1px solid var(--line);background:#fff;color:var(--navy2);font-weight:600;
+    padding:7px 13px;border-radius:20px;cursor:pointer;font-size:13.5px}
+  .sub-tabs button.active{background:var(--light);border-color:var(--blue);color:var(--navy)}
+  .sub{display:none}.sub.active{display:block}
+  .note-min{font-size:13px;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">LBEnglishCo · Denizli</div>
+    <h1>IELTS Academic Study Dashboard</h1>
+    <p>Your complete Band&nbsp;5&nbsp;→&nbsp;7 study system — built to be doable, paced for the long run.</p>
+    <div class="meta">
+      <span class="pill">🎯 Target: Band 7 (6.5 stepping stone)</span>
+      <span class="pill">📅 Exam window: Fall 2027</span>
+      <span class="pill">⏱ ~7–10 hrs/week</span>
+      <span class="pill">🇹🇷 Turkish-L1 aware</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tabrow" id="tabrow">
+    <button data-t="overview" class="active">Start Here</button>
+    <button data-t="notes">Study Notes</button>
+    <button data-t="plan">Weekly Plan</button>
+    <button data-t="daily">Daily Exercises</button>
+    <button data-t="vocab">Vocabulary</button>
+    <button data-t="grammar">Grammar</button>
+    <button data-t="practice">Practice + Timers</button>
+    <button data-t="templates">Answer Templates</button>
+    <button data-t="mistakes">Mistakes &amp; Fixes</button>
+    <button data-t="tips">Band-Up Tips</button>
+    <button data-t="checklist">Revision Checklist</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ===================== OVERVIEW ===================== -->
+<section class="panel active" id="overview">
+  <h2 class="sec">Start Here — The Honest Picture</h2>
+  <p class="lead">Read this once before anything else. It sets expectations so you stay motivated when progress feels slow.</p>
+
+  <div class="grid3">
+    <div class="card kpi"><div class="n">2.0</div><div class="l">Bands to gain (5→7)</div></div>
+    <div class="card kpi"><div class="n">~400+</div><div class="l">Guided hours needed</div></div>
+    <div class="card kpi"><div class="n">~15 mo</div><div class="l">Runway to Fall 2027</div></div>
+  </div>
+
+  <div class="callout win">
+    <b>Good news, stated plainly:</b> Band 7 by Fall 2027 is realistic at 7–10 hrs/week — but only if the pace is
+    sustained. A two-band jump is roughly 400+ guided hours of work, and the runway (~15 months from mid-2026)
+    genuinely fits that. The student who does 8 hours every week for over a year beats the one who sprints for six
+    weeks and burns out. We are building the steady version.
+  </div>
+
+  <h3>How the climb actually works</h3>
+  <table>
+    <tr><th>Move</th><th>Typical guided hours</th><th>Realistic calendar time</th><th>What's happening</th></tr>
+    <tr><td>Band 5 → 6</td><td>~200 hrs</td><td>5–8 months</td><td>Mostly format &amp; strategy — gains feel fast</td></tr>
+    <tr><td>Band 6 → 6.5</td><td>~120 hrs</td><td>2–4 months</td><td>Accuracy under pressure starts to matter</td></tr>
+    <tr><td>Band 6.5 → 7</td><td>~120+ hrs</td><td>3–6 months</td><td>Real language growth — the slow, quiet part</td></tr>
+  </table>
+  <p class="small">Progress is <b>not linear</b>. Early gains come quickly from learning the exam. Later gains require genuine
+  language growth and feel slower. <b>That plateau around Band 6 is normal — it's the gains going underground before they show, not failure.</b></p>
+
+  <div class="callout turk">
+    <b>🇹🇷 Turkish-L1 reality check:</b> Articles (a/the), the passive voice, and complex tense control are the
+    slowest-moving features for Turkish speakers — Turkish has no article system, so your brain naturally skips them.
+    You can learn the <i>rule</i> in one lesson, but accuracy under exam pressure takes <b>weeks of spaced practice</b>.
+    This is normal and completely trainable. We never treat "fix articles" as one-and-done.
+  </div>
+
+  <h3>The four ground rules of this system</h3>
+  <div class="grid2">
+    <div class="card"><h4>1 · Doable beats ambitious</h4>One new strategy, one grammar point, and 5–7 new words per study block —
+    no more. Homework is sized so you'll actually finish it. A small habit you keep beats a big plan you abandon.</div>
+    <div class="card"><h4>2 · Sequence by impact</h4>For a Band 5 writer/speaker, we fix <b>Task Response, coherence and grammatical
+    accuracy first</b> — the things capping your score — before polishing fancy vocabulary.</div>
+    <div class="card"><h4>3 · Retrieve, don't re-read</h4>You learn by <b>producing from memory</b> (mini-quizzes, gap-fills, speaking
+    aloud), spaced across days — not by re-reading notes. Re-reading feels productive but barely sticks.</div>
+    <div class="card"><h4>4 · Protect the loop</h4>Bank small wins early. Track sub-skills, not just the headline band. Feeling
+    that you're improving is what keeps you studying — and studying is what makes you improve.</div>
+  </div>
+
+  <div class="coach"><b>Mike says:</b> "We're not chasing Band 7 next month — we're building it over the next year, one
+  doable session at a time. Your job each week isn't to be perfect. It's to show up, do the small thing, and trust the
+  curve. I've got the map; you bring the consistency."</div>
+</section>
+
+<!-- ===================== STUDY NOTES ===================== -->
+<section class="panel" id="notes">
+  <h2 class="sec">Study Notes — All Five Sections</h2>
+  <p class="lead">Core knowledge for each part of the exam, anchored to what moves you from Band 5 toward Band 7.</p>
+  <div class="sub-tabs" data-group="notes">
+    <button class="active" data-s="n-listen">Listening</button>
+    <button data-s="n-read">Reading</button>
+    <button data-s="n-t1">Writing Task 1</button>
+    <button data-s="n-t2">Writing Task 2</button>
+    <button data-s="n-speak">Speaking</button>
+  </div>
+
+  <!-- Listening -->
+  <div class="sub active" id="n-listen">
+    <h3>Listening <span class="tag">40 Q · ~30 min · played ONCE</span></h3>
+    <table>
+      <tr><th>Section</th><th>Setting</th><th>Difficulty</th></tr>
+      <tr><td>1</td><td>Social/transactional (booking, enquiry) — 2 speakers</td><td>Easiest</td></tr>
+      <tr><td>2</td><td>Informational monologue (tour, talk) — 1 speaker</td><td>Easy–Medium</td></tr>
+      <tr><td>3</td><td>Academic discussion (tutorial) — 2–4 speakers</td><td>Medium–Hard</td></tr>
+      <tr><td>4</td><td>Academic lecture — 1 speaker</td><td>Hardest</td></tr>
+    </table>
+    <h4>The three things that lift your Listening band</h4>
+    <ul>
+      <li><b>Predict before the audio.</b> In the reading time, read every gap and decide the <i>word type</i>: number? name? place? day? Your brain then catches it faster.</li>
+      <li><b>Listen for the idea, not the word (parallel expression).</b> The audio almost never repeats the question's words. "It's not very expensive" → answer is <i>affordable</i>.</li>
+      <li><b>Section 4 = follow the signposts.</b> "Firstly… moving on to… in contrast… to summarise" mark topic shifts. Ride the structure and never leave a gap blank.</li>
+    </ul>
+    <div class="coach"><b>Mike says:</b> "When they say '30 seconds to read', use every second. Don't wait for the audio —
+    build a mental map of what's coming. Prediction is half the score."</div>
+    <div class="callout turk"><b>🇹🇷 Watch for:</b> mishearing final consonants ("bed/bet"), and number confusion —
+    <b>thirty vs thirteen</b>, <b>15th vs 50th</b>. Drill these specifically; they cost easy marks.</div>
+  </div>
+
+  <!-- Reading -->
+  <div class="sub" id="n-read">
+    <h3>Reading <span class="tag">40 Q · 60 min · no transfer time</span></h3>
+    <table>
+      <tr><th>Passage</th><th>Time</th><th>Note</th></tr>
+      <tr><td>1</td><td>17 min</td><td>Factual, concrete — bank time here</td></tr>
+      <tr><td>2</td><td>20 min</td><td>More abstract</td></tr>
+      <tr><td>3</td><td>23 min</td><td>Hardest — allow more</td></tr>
+    </table>
+    <h4>Skim → Scan → Read</h4>
+    <ol>
+      <li><b>Skim (2 min):</b> title, first sentence of each paragraph, last paragraph. Know <i>where</i> topics live.</li>
+      <li><b>Read the questions, underline keywords</b>, predict which paragraph holds each answer.</li>
+      <li><b>Scan</b> that paragraph only — hunt for <i>paraphrases</i>, not identical words.</li>
+      <li><b>90-second rule:</b> stuck? Circle it, move on. 40 questions, equal marks — never lose three easy ones chasing one hard one.</li>
+    </ol>
+    <h4>The classic trap</h4>
+    <p><b>NOT GIVEN ≠ FALSE.</b> FALSE = the passage directly contradicts the statement. NOT GIVEN = the passage is
+    <i>silent</i> on it. And <b>TFNG = facts</b>; <b>YES/NO/NG = the writer's opinion</b>.</p>
+    <div class="callout turk"><b>🇹🇷 Watch for:</b> picking FALSE when the answer is NOT GIVEN (Turkish texts tend to be
+    explicit, so silence feels wrong), and over-translating word-by-word, which kills your speed.</div>
+  </div>
+
+  <!-- Task 1 -->
+  <div class="sub" id="n-t1">
+    <h3>Writing Task 1 <span class="tag">20 min · 150+ words (aim 170–190)</span></h3>
+    <p class="small">Visuals: line graph · bar chart · pie chart · table · process diagram · map. Criteria: TA · CC · LR · GRA. Worth 1/3 of Writing.</p>
+    <h4>The four-part shape</h4>
+    <ol>
+      <li><b>Introduction</b> — paraphrase the prompt (change 60%+ of the words; never copy).</li>
+      <li><b>Overview</b> — the big picture, <b>no numbers</b>. <span class="tag alt">This separates Band 6 from Band 7</span></li>
+      <li><b>Body 1</b> — the most significant / largest data with figures.</li>
+      <li><b>Body 2</b> — key trends, changes, comparisons.</li>
+    </ol>
+    <div class="callout win"><b>The single biggest Task 1 upgrade:</b> a clear <i>Overview</i> sentence ("Overall, it is
+    clear that … while …"). Many Band 5–6 scripts describe data but never state the big picture. The overview is the
+    first thing the examiner looks for.</div>
+    <div class="callout turk"><b>🇹🇷 Process diagrams demand the passive</b> ("the beans <i>are roasted</i>") — under-used by
+    Turkish speakers. Drill passive transformations until they're automatic.</div>
+  </div>
+
+  <!-- Task 2 -->
+  <div class="sub" id="n-t2">
+    <h3>Writing Task 2 <span class="tag">40 min · 250+ words (aim 280–320)</span></h3>
+    <p class="small">Types: Opinion · Discussion · Problem/Solution · Advantages/Disadvantages · Direct Question. Criteria: TR · CC · LR · GRA. Worth 2/3 of Writing.</p>
+    <h4>The four-paragraph engine</h4>
+    <ol>
+      <li><b>Intro (40–60w):</b> background sentence + clear thesis (your position).</li>
+      <li><b>Body 1 (80–100w):</b> topic sentence → reason → example → link to thesis.</li>
+      <li><b>Body 2 (80–100w):</b> second idea or counter-argument, same shape.</li>
+      <li><b>Conclusion (40–50w):</b> restate thesis in new words + summary.</li>
+    </ol>
+    <div class="callout win"><b>What lifts Band 5 → 7 fastest here:</b> (1) <b>answer every part of the question</b> with a
+    <b>position held all the way through</b> (Task Response); (2) one clear idea per paragraph (Coherence); (3) more
+    error-free sentences (Grammar). Fancy vocabulary comes <i>after</i> these — not before.</div>
+    <div class="callout turk"><b>🇹🇷 Avoid the calque opener</b> "In today's modern world…" and the connector
+    "In addition to this situation…". Use <i>Furthermore / Moreover</i>. And drop articles less — "<b>the</b> governments"
+    → "governments" for general statements.</div>
+  </div>
+
+  <!-- Speaking -->
+  <div class="sub" id="n-speak">
+    <h3>Speaking <span class="tag">11–14 min · 3 parts · 25% each</span></h3>
+    <table>
+      <tr><th>Part</th><th>Focus</th><th>Your tool</th></tr>
+      <tr><td>1 (4–5 min)</td><td>Familiar topics</td><td><b>AREA</b>: Answer · Reason · Example · Add</td></tr>
+      <tr><td>2 (3–4 min)</td><td>Cue card — long turn</td><td>1-min plan → follow the bullets</td></tr>
+      <tr><td>3 (4–5 min)</td><td>Abstract discussion</td><td><b>PEEL</b>: Point · Explain · Example · Link</td></tr>
+    </table>
+    <div class="coach"><b>Mike says:</b> "Part 1 — don't give one word, don't give a speech. AREA: about 5–8 sentences.
+    Part 3 — if it's hard, say 'That's an interesting question, let me think for a moment.' That's natural, and it buys
+    you organising time."</div>
+    <div class="callout turk"><b>🇹🇷 Pronunciation priorities:</b> voiced final consonants (bed/bet), consonant clusters
+    (strength, texts), short vs long vowels (ship/sheep). And drop the overused filler "yani → I mean".
+    <b>Communication scores higher than nervous perfectionism</b> — fluency beats a perfect accent.</div>
+  </div>
+</section>
+
+<!-- ===================== WEEKLY PLAN ===================== -->
+<section class="panel" id="plan">
+  <h2 class="sec">Weekly Plan — Sustainable at 7–10 hrs/week</h2>
+  <p class="lead">This is the pace you'll still be following in a year. It assumes <b>~8 hours across the week</b>, with
+  built-in review and one lighter day. Two coached sessions + light daily work.</p>
+
+  <h3>Macro phases to Fall 2027</h3>
+  <table>
+    <tr><th>Phase</th><th>Window (approx.)</th><th>Focus</th><th>Milestone</th></tr>
+    <tr><td>1 · Foundations</td><td>Months 1–4</td><td>Exam format, Reading + Listening strategy, Task 2 structure, Speaking AREA</td><td>Confident with all question types</td></tr>
+    <tr><td>2 · Skill-building</td><td>Months 5–9</td><td>All question types, Task 1 visuals, grammar accuracy, vocabulary depth</td><td><b>Band 6 / 6.5 stepping stone</b></td></tr>
+    <tr><td>3 · Integration</td><td>Months 10–13</td><td>Full timed mocks, targeted weakness drilling, cohesion polish</td><td>Steady 6.5, reaching for 7</td></tr>
+    <tr><td>4 · Final prep</td><td>Months 14–15</td><td>Mocks under exam conditions, exam strategy, confidence + anxiety work</td><td><b>Band 7 attempt</b></td></tr>
+  </table>
+
+  <h3>A typical week (≈8 hours)</h3>
+  <table>
+    <tr><th>Day</th><th>Block</th><th>What</th><th>Time</th></tr>
+    <tr><td>Mon</td><td>Coached session</td><td>New strategy + grammar point + 5–7 words (one skill focus)</td><td>90 min</td></tr>
+    <tr><td>Tue</td><td>Daily retrieval</td><td>Vocab quiz from memory + 1 Reading question set</td><td>30–40 min</td></tr>
+    <tr><td>Wed</td><td>Productive skill</td><td>One timed Writing task (T1 or T2) — alternate weekly</td><td>45–60 min</td></tr>
+    <tr><td>Thu</td><td>Coached session</td><td>Second skill focus + spaced review of Mon's content</td><td>90 min</td></tr>
+    <tr><td>Fri</td><td>Listening + speaking</td><td>1 Listening section + record one Part 2 cue card aloud</td><td>40 min</td></tr>
+    <tr><td>Sat</td><td>Integration</td><td>Mixed practice set (interleaved question types) + review errors</td><td>60–75 min</td></tr>
+    <tr><td>Sun</td><td><b>Lighter day</b></td><td>10-min vocab retrieval only — rest and consolidate</td><td>10 min</td></tr>
+  </table>
+  <p class="note-min">Total ≈ 7–9 hrs. Adjust the heavy days to your real life — the plan you keep beats the plan that looks impressive.</p>
+
+  <div class="callout win"><b>Why it's built this way:</b> two focused inputs (Mon/Thu) with the <b>same content retrieved
+  again later in the week</b> (spacing), <b>one rest day</b> to consolidate, and Saturday <b>interleaves</b> question
+  types so practice mirrors the real, mixed exam.</div>
+
+  <div class="callout turk"><b>🇹🇷 Build a recurring "grammar clinic"</b> roughly every third week — articles, passives,
+  tense consistency. These are spaced re-practice targets, not one-time fixes.</div>
+
+  <details><summary>Resource pairing (Mike's library)</summary>
+    <ul>
+      <li>Format matching &amp; mocks: <b>Cambridge IELTS 13–20</b> (use later books for final mocks).</li>
+      <li>Writing frameworks: <b>Collins Writing for IELTS</b> (T1 &amp; T2).</li>
+      <li>Reading / Listening / Speaking strategy: <b>Collins ___ for IELTS</b> series.</li>
+      <li>Examiner insight &amp; descriptors: <b>Official Cambridge Guide to IELTS</b>.</li>
+      <li>Extra drilling: <b>Barron's IELTS</b>.</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ===================== DAILY EXERCISES ===================== -->
+<section class="panel" id="daily">
+  <h2 class="sec">Daily Exercises — Small, Spaced, Retrieval-First</h2>
+  <p class="lead">Short daily retrieval beats one big weekly cram. Attach each to an existing habit so it actually happens.</p>
+
+  <div class="callout win"><b>Habit hook (do this):</b> "After my morning coffee, I do 10 minutes of vocab retrieval."
+  Naming <i>when and where</i> roughly doubles follow-through. Rule: <b>never miss twice.</b> One skipped day is noise.</div>
+
+  <h3>The 15–30 minute daily menu (pick one)</h3>
+  <div class="grid2">
+    <div class="card"><h4>Mon — Vocab retrieval</h4>Cover yesterday's words. Produce each from its definition + write one
+    sentence. <span class="note-min">Retrieval, not re-reading.</span></div>
+    <div class="card"><h4>Tue — Reading set</h4>One question set (mix 2–3 types). Then <b>explain why</b> each answer is right —
+    elaboration locks it in.</div>
+    <div class="card"><h4>Wed — Sentence surgery</h4>Take 5 of your own error sentences; rewrite correctly. Focus this week's grammar point.</div>
+    <div class="card"><h4>Thu — Listening micro</h4>One Section, predict gaps first, check spelling of every answer.</div>
+    <div class="card"><h4>Fri — Speaking aloud</h4>Record one Part 1 answer with AREA <i>or</i> one Part 2 cue card. Listen back once.</div>
+    <div class="card"><h4>Sat — Timed task</h4>One Writing task under the clock (see Practice tab timers).</div>
+  </div>
+
+  <h3>The spacing schedule (how memory actually works)</h3>
+  <p>Every new word or rule learned on <b>Day 1</b> is retrieved again on <b>Day 2 → Day 4 → Day 8 → Day 16</b>.
+  A word is "known" only after ~5 successful spaced retrievals in different contexts — not after one lesson.</p>
+  <div class="coach"><b>Mike says:</b> "Ten honest minutes a day will beat a heroic three-hour Sunday every single time.
+  Consistency compounds; intensity collapses."</div>
+</section>
+
+<!-- ===================== VOCABULARY ===================== -->
+<section class="panel" id="vocab">
+  <h2 class="sec">Vocabulary — Band 5 → 6 → 7 Upgrades</h2>
+  <p class="lead">Learn in topic sets. <b>Cap each study block at 5–7 active words.</b> Aim for the Band 7 column, but only when
+  it fits naturally — wrong "fancy" words score lower than accurate plain ones.</p>
+
+  <div class="sub-tabs" data-group="vocab">
+    <button class="active" data-s="v-env">Environment</button>
+    <button data-s="v-edu">Education</button>
+    <button data-s="v-tech">Technology</button>
+    <button data-s="v-health">Health</button>
+    <button data-s="v-colloc">Collocations</button>
+  </div>
+
+  <div class="sub active" id="v-env">
+    <table><tr><th>Band 5</th><th>Band 6</th><th>Band 7</th></tr>
+      <tr><td>bad for the environment</td><td>harmful to the environment</td><td>environmentally damaging / ecologically destructive</td></tr>
+      <tr><td>help the environment</td><td>benefit the environment</td><td>mitigate environmental impact</td></tr>
+      <tr><td>big problem</td><td>serious issue</td><td>pressing concern / critical challenge</td></tr>
+      <tr><td>use less energy</td><td>reduce energy consumption</td><td>adopt energy-efficient practices</td></tr>
+      <tr><td>make pollution</td><td>cause pollution</td><td>contribute to carbon emissions</td></tr>
+    </table>
+  </div>
+  <div class="sub" id="v-edu">
+    <table><tr><th>Band 5</th><th>Band 6</th><th>Band 7</th></tr>
+      <tr><td>learn things</td><td>acquire knowledge</td><td>develop skills and knowledge</td></tr>
+      <tr><td>good for students</td><td>beneficial for learners</td><td>academically advantageous</td></tr>
+      <tr><td>go to university</td><td>attend university</td><td>pursue higher education</td></tr>
+      <tr><td>teach skills</td><td>develop skills</td><td>cultivate practical skills / hone critical thinking</td></tr>
+      <tr><td>get a job</td><td>find employment</td><td>enter the workforce / secure a career</td></tr>
+    </table>
+  </div>
+  <div class="sub" id="v-tech">
+    <table><tr><th>Band 5</th><th>Band 6</th><th>Band 7</th></tr>
+      <tr><td>use technology</td><td>utilise technology</td><td>harness technological advances</td></tr>
+      <tr><td>good and bad things</td><td>advantages and disadvantages</td><td>merits and drawbacks</td></tr>
+      <tr><td>the internet</td><td>online platforms</td><td>digital infrastructure</td></tr>
+      <tr><td>lose their jobs</td><td>face unemployment</td><td>be displaced from the workforce</td></tr>
+      <tr><td>change the world</td><td>transform society</td><td>reshape the socioeconomic landscape</td></tr>
+    </table>
+  </div>
+  <div class="sub" id="v-health">
+    <table><tr><th>Band 5</th><th>Band 6</th><th>Band 7</th></tr>
+      <tr><td>be healthy</td><td>maintain good health</td><td>sustain physical and mental wellbeing</td></tr>
+      <tr><td>eat well</td><td>have a balanced diet</td><td>adhere to a nutritious diet</td></tr>
+      <tr><td>do exercise</td><td>engage in physical activity</td><td>incorporate regular exercise into one's routine</td></tr>
+      <tr><td>be sick</td><td>suffer from illness</td><td>be afflicted by disease</td></tr>
+      <tr><td>government should help</td><td>governments have a responsibility</td><td>policymakers are obligated to</td></tr>
+    </table>
+  </div>
+  <div class="sub" id="v-colloc">
+    <h4>Cause &amp; effect</h4><p>play a significant role in · have a profound impact on · contribute to / lead to · stem from · give rise to · exacerbate</p>
+    <h4>Opinion &amp; argument</h4><p>it is widely acknowledged that · there is growing consensus that · evidence suggests that · a compelling argument can be made that</p>
+    <h4>Contrast &amp; concession</h4><p>despite the fact that · although this may be the case · while this argument has some merit · critics argue that… however,…</p>
+    <h4>Solutions</h4><p>one viable solution would be to · a more effective approach would involve · a combination of measures is required · long-term investment in… is essential</p>
+  </div>
+
+  <div class="callout turk"><b>🇹🇷 Vocabulary calques to delete:</b> "make research" → <b>conduct research</b>; "make benefit" →
+  <b>benefit from</b>; "environmental pollutions" → <b>pollution</b> (uncountable); "in the result of" → <b>as a result of</b>;
+  "important problem" → <b>pressing issue</b>.</div>
+
+  <details><summary>The 20 core IELTS topics to rotate through</summary>
+    <p class="small">Education · Technology · Environment · Health · Globalisation · Work · Society · Crime · Media ·
+    Transport · Tourism · Family · Arts · Science · Food &amp; Agriculture · Language · Children &amp; Youth ·
+    Gender &amp; Equality · Urban Development · Economics.</p>
+  </details>
+</section>
+
+<!-- ===================== GRAMMAR ===================== -->
+<section class="panel" id="grammar">
+  <h2 class="sec">Grammar — Targeted at Your Band Ceiling</h2>
+  <p class="lead">For a Band 5 writer, grammar accuracy and range are usually the biggest brake. These are the structures
+  that unlock higher GRA bands — and the Turkish-L1 errors that cap them. <b>One structure at a time, then spaced re-practice.</b></p>
+
+  <h3>Grammar–band map</h3>
+  <table>
+    <tr><th>Structure</th><th>Band it helps unlock</th><th>Band 5 version → Band 7 version</th></tr>
+    <tr><td>Articles (a/an/the/zero)</td><td>5.5 → 6</td><td>"Government should help nature" → "<b>The</b> government should protect <b>the</b> environment"</td></tr>
+    <tr><td>Complex sentences (subordination)</td><td>6 → 7</td><td>"Cars cause pollution. This is bad." → "Because cars generate emissions, <b>which</b> harm air quality, …"</td></tr>
+    <tr><td>Passive voice</td><td>6 (esp. T1 process)</td><td>"They roast the beans" → "The beans <b>are roasted</b>"</td></tr>
+    <tr><td>Relative clauses</td><td>6 → 7</td><td>"Students who study abroad…" / "a policy <b>that</b> reduces waste"</td></tr>
+    <tr><td>Conditionals</td><td>6.5 → 7</td><td>"If governments invested more, emissions <b>would</b> fall"</td></tr>
+    <tr><td>Perfect aspect</td><td>6 → 6.5</td><td>"Pollution increased" → "Pollution <b>has risen</b> sharply over the past decade"</td></tr>
+  </table>
+
+  <h3>This-month grammar tasks (rotate one per week)</h3>
+  <ol>
+    <li><b>Article drill:</b> take 10 of your own sentences; mark every noun a/an/the/zero. Re-test the same set in 8 days.</li>
+    <li><b>Passive transformation:</b> rewrite 8 active process sentences into the passive ("First, the data is collected…").</li>
+    <li><b>Sentence combining:</b> join 6 pairs of simple sentences using <i>which / because / although / whereas</i>.</li>
+    <li><b>Tense timeline:</b> match 6 sentences to a timeline; fix any present-simple-for-everything habit.</li>
+    <li><b>Connector swap:</b> replace heavy calque connectors with single-word academic ones (see below).</li>
+  </ol>
+
+  <div class="callout turk"><b>🇹🇷 The six recurring Turkish-L1 grammar errors</b> (and the fix):
+  <ul style="margin-top:6px">
+    <li><b>Missing article</b> (no article system in Turkish) → "The + noun" practice.</li>
+    <li><b>Passive avoidance</b> → passive drills on Task 1 processes.</li>
+    <li><b>Connector overuse</b> ("In addition to this situation,") → single words: <i>Furthermore,</i></li>
+    <li><b>Wrong preposition</b> (postposition mapping) → preposition-collocation drills.</li>
+    <li><b>Subject repetition / drop</b> → pronoun practice (English needs the subject).</li>
+    <li><b>Tense inconsistency</b> → timeline-tense matching.</li>
+  </ul>
+  Frame: this is <i>predictable L1 transfer</i>, not a personal weakness — and it's exactly the kind of error that's trainable.</div>
+</section>
+
+<!-- ===================== PRACTICE ===================== -->
+<section class="panel" id="practice">
+  <h2 class="sec">Practice Questions + Exam Timers</h2>
+  <p class="lead">Original practice modelled on the real format (never copied from Cambridge tests). Time yourself, attempt
+  first, <b>then</b> reveal answers. Frequent timed practice is the single biggest lever for lowering exam anxiety.</p>
+
+  <h3>⏱ Exam timers</h3>
+  <div class="card">
+    <div class="grid3">
+      <div style="text-align:center"><div class="timer" id="tdisp">20:00</div></div>
+      <div style="text-align:center">
+        <button class="timer-btn" onclick="setT(20)">Reading passage 20m</button>
+        <button class="timer-btn" onclick="setT(20)">Task 1 · 20m</button>
+        <button class="timer-btn" onclick="setT(40)">Task 2 · 40m</button>
+        <button class="timer-btn" onclick="setT(2)">Speaking P2 · 2m</button>
+      </div>
+      <div style="text-align:center">
+        <button class="timer-btn" id="startbtn" onclick="toggleT()">Start</button>
+        <button class="timer-btn" onclick="resetT()" style="background:#8794a1">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <h3>Reading — True / False / Not Given <span class="tag">TFNG</span></h3>
+  <div class="card">
+    <p class="small"><b>Passage extract:</b> "The common swift spends almost its entire life in flight, even sleeping on the
+    wing. Researchers tracking the birds found that some individuals remained airborne for ten months without landing.
+    The species feeds exclusively on airborne insects. Although swifts are often mistaken for swallows, the two belong to
+    entirely different families."</p>
+    <div class="q">1. Swifts can sleep while flying. &nbsp; <span class="small">(T / F / NG)</span></div>
+    <div class="q">2. Swifts are a type of swallow. &nbsp; <span class="small">(T / F / NG)</span></div>
+    <div class="q">3. Swifts live longer than swallows. &nbsp; <span class="small">(T / F / NG)</span></div>
+    <button class="reveal-btn" onclick="rev('a1')">Reveal answers</button>
+    <div class="answer" id="a1">
+      <b>1. TRUE</b> — "even sleeping on the wing" = sleep while flying.<br>
+      <b>2. FALSE</b> — they "belong to entirely different families"; directly contradicted.<br>
+      <b>3. NOT GIVEN</b> — lifespan is never mentioned. (Tempting to guess, but the text is silent — that's NG, not F.)
+    </div>
+  </div>
+
+  <h3>Listening — Note Completion <span class="tag">N/F/T</span></h3>
+  <div class="card">
+    <p class="small"><b>Tapescript:</b> "Right, so the workshop runs on the <u>fourteenth</u> of March, starting at half past
+    nine. It's held in the Maxwell Building, room <u>2B</u>, and there's a materials fee of <u>fifteen</u> pounds payable on
+    the day." <i>(NO MORE THAN ONE WORD AND/OR A NUMBER)</i></p>
+    <div class="q">1. Date: ___ March</div>
+    <div class="q">2. Room: ___</div>
+    <div class="q">3. Fee: £___</div>
+    <button class="reveal-btn" onclick="rev('a2')">Reveal answers</button>
+    <div class="answer" id="a2"><b>1.</b> 14th &nbsp; <b>2.</b> 2B &nbsp; <b>3.</b> 15<br>
+      <span class="small">🇹🇷 Note "fifteen" not "fifty", and "half past nine" = 9:30. Spelling/number accuracy = easy marks.</span></div>
+  </div>
+
+  <h3>Writing Task 2 — Plan one <span class="tag">Opinion</span></h3>
+  <div class="card">
+    <p><b>Prompt:</b> <i>Some people believe university education should be free for all students. To what extent do you agree
+    or disagree?</i></p>
+    <p class="small">Start the 40-minute timer above. Plan a thesis + two body ideas before writing.</p>
+    <button class="reveal-btn" onclick="rev('a3')">Reveal a Band 7 plan</button>
+    <div class="answer" id="a3">
+      <b>Thesis:</b> Largely agree — free tuition widens access and benefits society, though it must be funded sustainably.<br>
+      <b>Body 1:</b> Access &amp; equality — cost currently bars capable low-income students; free education lets talent, not wealth, decide. <i>Example: countries with free tuition show broader participation.</i><br>
+      <b>Body 2:</b> Societal return — graduates pay more tax, innovate, staff key services; so the state recoups its investment.<br>
+      <b>Concession:</b> It is costly — but a graduate tax or tiered funding addresses this without charging upfront fees.<br>
+      <b>Conclusion:</b> Restate: benefits to access and society outweigh the cost, provided funding is well-designed.
+    </div>
+  </div>
+
+  <h3>Speaking — Part 2 cue card <span class="tag">Long turn</span></h3>
+  <div class="card">
+    <p><b>Describe a skill you would like to learn.</b> You should say: what the skill is · why you want to learn it ·
+    how you would learn it · and explain how it would change your life.</p>
+    <p class="small">1 minute to plan (jot 2–3 words per bullet), then talk for 2 minutes. Record yourself.</p>
+    <button class="reveal-btn" onclick="rev('a4')">Reveal a model opening + closing</button>
+    <div class="answer" id="a4">
+      <b>Open:</b> "I'd like to talk about learning to code, specifically Python, which is something I've wanted to do for a while."<br>
+      <b>Close:</b> "Overall, I'd say this skill would genuinely reshape my career options, which is why I'm so keen to start."<br>
+      <span class="small">Notice the relative clause ("which…") and the closing signpost ("Overall, I'd say…") — both push toward Band 7.</span>
+    </div>
+  </div>
+
+  <h3>Reading — Matching Headings <span class="tag">MH</span></h3>
+  <div class="card">
+    <p class="small">Match a heading to each paragraph. <b>More headings than paragraphs.</b> Read first + last sentence only.</p>
+    <p class="small"><b>¶A:</b> "The earliest coins appeared independently in several ancient civilisations…"<br>
+    <b>¶B:</b> "Today, however, physical cash is rapidly being replaced by digital payment systems…"</p>
+    <p class="small"><b>Headings:</b> i) The future of cashless payment · ii) Why coins lost value · iii) The origins of currency</p>
+    <button class="reveal-btn" onclick="rev('a5')">Reveal answers</button>
+    <div class="answer" id="a5"><b>¶A → iii</b> (origins) · <b>¶B → i</b> (cashless future). Heading <b>ii</b> is the distractor — never used.</div>
+  </div>
+</section>
+
+<!-- ===================== TEMPLATES ===================== -->
+<section class="panel" id="templates">
+  <h2 class="sec">Answer Templates</h2>
+  <p class="lead">Scaffolds, not scripts. Use them to organise fast, then fill with your own ideas and accurate language.</p>
+
+  <h3>Writing Task 1 — universal frame</h3>
+  <div class="card">
+    <p><b>Intro:</b> "The [graph/chart/table/diagram] illustrates [what] [where/when]." <span class="small">(paraphrase — change 60%+)</span></p>
+    <p><b>Overview:</b> "Overall, it is clear that [main trend 1], while [main trend 2]." <span class="small">(no numbers)</span></p>
+    <p><b>Body 1:</b> "In [year], [subject] stood at / accounted for [figure], compared to [contrast]."</p>
+    <p><b>Body 2:</b> "Between [X] and [Y], [subject] rose/fell [sharply/gradually] from [..] to [..]."</p>
+    <p class="small"><b>Trend upgrades:</b> went up → <i>rose sharply / climbed steadily</i>; went down → <i>declined significantly</i>;
+    stayed same → <i>remained stable / plateaued</i>; biggest → <i>accounted for the largest proportion</i>.</p>
+  </div>
+
+  <h3>Writing Task 2 — by essay type</h3>
+  <div class="grid2">
+    <div class="card"><h4>Opinion</h4>Intro: position clear. Body 1: strongest argument FOR. Body 2: concede a counter → refute it. Conclusion: reaffirm.</div>
+    <div class="card"><h4>Discussion (both views + opinion)</h4>Intro: both views + your view. Body 1: view A. Body 2: view B. Conclusion: which is more convincing &amp; why.</div>
+    <div class="card"><h4>Problem / Solution</h4>Body 1: 2–3 causes/problems. Body 2: solutions matched to them. Conclusion: overall statement.</div>
+    <div class="card"><h4>Advantages / Disadvantages</h4>Body 1: advantages + examples. Body 2: disadvantages + examples. Conclusion: balanced judgement.</div>
+  </div>
+
+  <h3>Speaking frames</h3>
+  <div class="card">
+    <p><b>Part 1 — AREA:</b> <b>A</b>nswer → <b>R</b>eason → <b>E</b>xample → <b>A</b>dd. (~5–8 sentences.)</p>
+    <p><b>Part 2 — long turn:</b> "I'd like to describe…" → bullet 1 → bullet 2 (most detail) → bullet 3 (why/feelings) → "Overall, I'd say…"</p>
+    <p><b>Part 3 — PEEL:</b> <b>P</b>oint → <b>E</b>xplain → <b>E</b>xample → <b>L</b>ink. Or concession: "While it's true that…, I'd argue that… because…"</p>
+    <p class="small"><b>Band 7 discourse markers:</b> "From my perspective…", "Having said that…", "What's more…", "Admittedly…", "It's possible that…"</p>
+  </div>
+
+  <div class="callout turk"><b>🇹🇷 Template warning:</b> memorised templates help <i>structure</i>, but examiners penalise memorised
+  <i>content</i>. Keep the frame, make every idea and example your own.</div>
+</section>
+
+<!-- ===================== MISTAKES ===================== -->
+<section class="panel" id="mistakes">
+  <h2 class="sec">Common Mistakes &amp; Fixes</h2>
+  <p class="lead">Most of these are predictable Turkish-L1 transfer patterns — normal, and trainable. Fix the high-impact ones first.</p>
+
+  <h3>Across the whole exam (Turkish-L1)</h3>
+  <table>
+    <tr><th>Mistake</th><th>Fix</th><th>Hits</th></tr>
+    <tr><td>Dropping a/an/the</td><td>"The + noun" drills; check every noun</td><td>GRA (caps ~5.5)</td></tr>
+    <tr><td>Avoiding the passive</td><td>Passive transformation drills (esp. T1 process)</td><td>GRA / LR</td></tr>
+    <tr><td>"In addition to this situation,"</td><td>Use <i>Furthermore, / Moreover,</i></td><td>CC (caps ~6)</td></tr>
+    <tr><td>SOV word-order slips in complex sentences</td><td>Sentence-combining practice</td><td>GRA (caps ~5.5)</td></tr>
+    <tr><td>Present simple for everything</td><td>Timeline-tense matching; use perfect/past</td><td>GRA (caps ~6)</td></tr>
+    <tr><td>Word-for-word collocations ("make research")</td><td>Learn chunks: <i>conduct research</i></td><td>LR (caps ~5.5)</td></tr>
+  </table>
+
+  <h3>Skill-specific traps</h3>
+  <div class="grid2">
+    <div class="card"><h4>Reading</h4>Choosing FALSE when it's NOT GIVEN · hunting exact words instead of paraphrases · over-translating (kills speed).</div>
+    <div class="card"><h4>Listening</h4>Waiting for the exact word (it's paraphrased) · thirty/thirteen &amp; 15th/50th · spelling errors on names/places · leaving gaps blank.</div>
+    <div class="card"><h4>Writing T1</h4>No overview sentence · putting numbers in the overview · describing every data point instead of selecting the key ones.</div>
+    <div class="card"><h4>Writing T2</h4>Not answering all parts · position drifting mid-essay · "In today's modern world…" opener · listing ideas without developing one.</div>
+    <div class="card"><h4>Speaking</h4>One-word Part 1 answers · jumping around the cue card · over-formal register · filler "yani/I mean" · freezing on silence (use a thinking phrase).</div>
+  </div>
+
+  <div class="coach"><b>Mike says:</b> "An error isn't a verdict — it's information. Each one tells us exactly what to practise
+  next. We fix two or three at a time, never twenty. That's how you actually improve without drowning."</div>
+</section>
+
+<!-- ===================== BAND-UP TIPS ===================== -->
+<section class="panel" id="tips">
+  <h2 class="sec">Band-Up Tips — What Moves You One Band</h2>
+  <p class="lead">Each tip is the highest-leverage change for that skill. Master the lower band's move before reaching for the next.</p>
+
+  <div class="grid2">
+    <div class="card"><h4>Listening 5 → 6 → 7</h4>
+      <ul><li><b>→6:</b> Predict word-type in the reading time; stop missing easy gaps.</li>
+      <li><b>→6.5:</b> Train parallel expression — hear the idea, not the word.</li>
+      <li><b>→7:</b> Master Section 3–4 signposting; never leave blanks; flawless spelling.</li></ul></div>
+
+    <div class="card"><h4>Reading 5 → 6 → 7</h4>
+      <ul><li><b>→6:</b> Time discipline — 90-second rule, skip and return.</li>
+      <li><b>→6.5:</b> Nail TFNG vs NG logic and writer's-opinion (YNG) questions.</li>
+      <li><b>→7:</b> Matching Headings via main-idea-only reading; resist word-match traps.</li></ul></div>
+
+    <div class="card"><h4>Writing 5 → 6 → 7</h4>
+      <ul><li><b>→6:</b> Answer <b>all parts</b>; clear 4-paragraph structure; T1 overview sentence.</li>
+      <li><b>→6.5:</b> Hold one position throughout; one idea per paragraph; more error-free sentences.</li>
+      <li><b>→7:</b> A <i>variety</i> of complex structures used <i>accurately</i> + precise, less-common vocabulary used naturally.</li></ul></div>
+
+    <div class="card"><h4>Speaking 5 → 6 → 7</h4>
+      <ul><li><b>→6:</b> Extend with AREA/PEEL; stop one-word answers.</li>
+      <li><b>→6.5:</b> Range of connectives; willing to speak at length; self-correct smoothly.</li>
+      <li><b>→7:</b> Speak at length without effort; complex structures; less-common vocab; clear pronunciation.</li></ul></div>
+  </div>
+
+  <div class="callout win"><b>The Band 7 throughline:</b> across all four skills, Band 7 = <b>"a range / variety of complex
+  features used accurately, with frequent error-free output."</b> Range <i>and</i> accuracy together — not one at the cost
+  of the other. That's why we build accuracy first, then stretch range on top of it.</div>
+
+  <div class="callout turk"><b>🇹🇷 Biggest single band-lifter for you:</b> article + tense + passive accuracy. These three are
+  the slow-burn GRA features — drilling them with spaced practice over months is what cracks the 5.5/6.0 ceiling.</div>
+</section>
+
+<!-- ===================== CHECKLIST ===================== -->
+<section class="panel" id="checklist">
+  <h2 class="sec">Revision Checklist</h2>
+  <p class="lead">Tick as you go — your progress saves automatically in this browser. Use it before each mock and before exam day.</p>
+
+  <div class="progwrap"><div class="progbar" id="progbar"></div></div>
+  <p class="small" id="progtext">0 of 0 done</p>
+
+  <div class="card check" id="checkbox">
+    <h4>Listening</h4>
+    <label><input type="checkbox"><span>I predict word-type for every gap in the reading time</span></label>
+    <label><input type="checkbox"><span>I listen for paraphrase, not exact words</span></label>
+    <label><input type="checkbox"><span>I can follow Section 4 signposting without panicking</span></label>
+    <label><input type="checkbox"><span>I double-check spelling of names, places, and numbers</span></label>
+
+    <h4>Reading</h4>
+    <label><input type="checkbox"><span>I skim before reading questions</span></label>
+    <label><input type="checkbox"><span>I apply the 90-second rule and skip/return</span></label>
+    <label><input type="checkbox"><span>I can reliably tell FALSE from NOT GIVEN</span></label>
+    <label><input type="checkbox"><span>I read first/last sentence only for Matching Headings</span></label>
+
+    <h4>Writing Task 1</h4>
+    <label><input type="checkbox"><span>I always write a number-free overview sentence</span></label>
+    <label><input type="checkbox"><span>I select key data instead of describing everything</span></label>
+    <label><input type="checkbox"><span>I use the passive in process diagrams</span></label>
+
+    <h4>Writing Task 2</h4>
+    <label><input type="checkbox"><span>I answer every part of the question</span></label>
+    <label><input type="checkbox"><span>I hold one clear position all the way through</span></label>
+    <label><input type="checkbox"><span>One idea per paragraph, developed with an example</span></label>
+    <label><input type="checkbox"><span>I check articles, tense, and prepositions when I review</span></label>
+
+    <h4>Speaking</h4>
+    <label><input type="checkbox"><span>I extend answers with AREA (Part 1) and PEEL (Part 3)</span></label>
+    <label><input type="checkbox"><span>I plan the cue card in the full minute</span></label>
+    <label><input type="checkbox"><span>I have thinking-phrases ready so silence doesn't spiral</span></label>
+    <label><input type="checkbox"><span>I focus on communication, not a perfect accent</span></label>
+
+    <h4>Habits &amp; mindset</h4>
+    <label><input type="checkbox"><span>I do short daily retrieval (never miss twice)</span></label>
+    <label><input type="checkbox"><span>I do timed practice weekly to build calm familiarity</span></label>
+    <label><input type="checkbox"><span>I treat a low mock score as a map, not a verdict</span></label>
+  </div>
+  <button class="timer-btn" onclick="resetCheck()" style="background:#8794a1">Clear all ticks</button>
+</section>
+
+</main>
+
+<footer>
+  <b>LBEnglishCo</b> · IELTS Academic coaching, Denizli · Band 5 → 7 study system<br>
+  Grounded in the official band descriptors, spaced-retrieval learning science, and Turkish-L1 error awareness.
+  Built to be doable and realistic — no false promises.
+</footer>
+
+<script>
+/* ---- main tabs ---- */
+document.querySelectorAll('#tabrow button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#tabrow button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById(b.dataset.t).classList.add('active');
+    try{localStorage.setItem('lbe_tab',b.dataset.t);}catch(e){}
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+/* restore last tab */
+try{
+  var lt=localStorage.getItem('lbe_tab');
+  if(lt&&document.getElementById(lt)){
+    document.querySelectorAll('#tabrow button').forEach(x=>x.classList.toggle('active',x.dataset.t===lt));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===lt));
+  }
+}catch(e){}
+
+/* ---- sub-tabs (notes + vocab) ---- */
+document.querySelectorAll('.sub-tabs').forEach(group=>{
+  group.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      group.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active');
+      var sect=group.closest('.panel');
+      // hide siblings within same logical block
+      var target=btn.dataset.s;
+      group.parentNode.querySelectorAll(':scope > .sub').forEach(s=>s.classList.remove('active'));
+      var el=document.getElementById(target);
+      if(el) el.classList.add('active');
+    });
+  });
+});
+
+/* ---- answer reveal ---- */
+function rev(id){var e=document.getElementById(id);e.classList.toggle('show');}
+
+/* ---- timer ---- */
+var total=20*60, remain=total, tick=null, running=false;
+function fmt(s){var m=Math.floor(s/60),x=s%60;return (m<10?'0':'')+m+':'+(x<10?'0':'')+x;}
+function draw(){document.getElementById('tdisp').textContent=fmt(remain);}
+function setT(min){total=min*60;remain=total;running=false;clearInterval(tick);document.getElementById('startbtn').textContent='Start';draw();}
+function toggleT(){
+  if(running){clearInterval(tick);running=false;document.getElementById('startbtn').textContent='Resume';return;}
+  running=true;document.getElementById('startbtn').textContent='Pause';
+  tick=setInterval(()=>{
+    if(remain<=0){clearInterval(tick);running=false;document.getElementById('startbtn').textContent='Start';
+      document.getElementById('tdisp').textContent="TIME!";return;}
+    remain--;draw();
+  },1000);
+}
+function resetT(){clearInterval(tick);running=false;remain=total;document.getElementById('startbtn').textContent='Start';draw();}
+draw();
+
+/* ---- checklist + persistence ---- */
+var boxes=document.querySelectorAll('#checkbox input[type=checkbox]');
+function saveCheck(){
+  var state=[];boxes.forEach(b=>state.push(b.checked?1:0));
+  try{localStorage.setItem('lbe_check',JSON.stringify(state));}catch(e){}
+  updateProg();
+}
+function loadCheck(){
+  try{
+    var s=JSON.parse(localStorage.getItem('lbe_check')||'[]');
+    boxes.forEach((b,i)=>{b.checked=!!s[i];b.closest('label').classList.toggle('done',b.checked);});
+  }catch(e){}
+  updateProg();
+}
+function updateProg(){
+  var done=0;boxes.forEach(b=>{if(b.checked)done++;});
+  var pct=boxes.length?Math.round(done/boxes.length*100):0;
+  document.getElementById('progbar').style.width=pct+'%';
+  document.getElementById('progtext').textContent=done+' of '+boxes.length+' done ('+pct+'%)';
+}
+boxes.forEach(b=>b.addEventListener('change',()=>{b.closest('label').classList.toggle('done',b.checked);saveCheck();}));
+function resetCheck(){boxes.forEach(b=>{b.checked=false;b.closest('label').classList.remove('done');});saveCheck();}
+loadCheck();
+</script>
+</body>
+</html>
